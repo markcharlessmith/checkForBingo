@@ -21,21 +21,46 @@
 
 // input: bingoCard (arr), drawnNumbers (arr)
 // output: boolean
+
 function checkForBingo(bingoCard, drawnNumbers) {
-  // this code for debug purposes, you can remove.
-  console.log('Drawn Numbers: ' + JSON.stringify(drawnNumbers));
-  for (let i = 0, len = bingoCard.length; i < len; i++) {
-    let row = Math.floor(i / 5);
+  // a bingo card has five rows and five columns
+  let x = new Array(5).fill(0);
+  let y = new Array(5).fill(0);
+  // bingo can only be achieved diagonally two ways (top left to bottom right or bottom left to top right)
+  let diag = new Array(2).fill(0);
+
+  for (let i = 0; i < bingoCard.length; i++) {
+    let row = i % 5;
     let col = i % 5;
-    console.log(`${row},${col}: ${bingoCard[i]}`);
-    //   // conditional check for 'FREE'
+
+    //check if either the evaluated result of hasNumber is true or bingoCard[i] is 'FREE'
+    if (hasNumber(drawnNumbers, bingoCard[i]) || bingoCard[i] === 'FREE') {
+      // if so, add 1 to x[row] and y[col];
+      x[row] += 1;
+      y[col] += 1;
+      // check if row and col are equal, if so add 1 to the 0th index of diag
+      if (row === col) diag[0] += 1;
+      // if the sum of row and col is equal to either the x or y length - 1,
+      // add 1 to index 1 of diag
+      if (row + col === x.length - 1 || row + col === y.length - 1)
+        diag[1] += 1;
+    }
   }
-  return false;
+  return hasNumber(x, 5) || hasNumber(y, 5) || hasNumber(diag, 5);
+
+  //helper function to check if arr[i] === n
+  function hasNumber(arr, n) {
+    for (let i = 0; i < arr.length; i += 1) {
+      if (arr[i] === n) return true;
+    }
+    return false;
+  }
 }
 
 module.exports = checkForBingo;
 
-// here are some samples
+// Test Cases //
+
 // this should return true with diagonal + free
 console.log(
   checkForBingo(
@@ -101,5 +126,107 @@ console.log(
       72,
     ],
     [1, 33, 53, 65, 29, 75]
+  )
+);
+
+// // should return true for BINGO vertically
+console.log(
+  checkForBingo(
+    [
+      8,
+      29,
+      35,
+      54,
+      65,
+      13,
+      24,
+      44,
+      48,
+      67,
+      9,
+      21,
+      'FREE',
+      59,
+      63,
+      7,
+      19,
+      34,
+      53,
+      61,
+      1,
+      20,
+      33,
+      46,
+      72,
+    ],
+    [8, 13, 9, 7, 1]
+  )
+);
+
+// // should return true for BINGO horizontally
+console.log(
+  checkForBingo(
+    [
+      8,
+      29,
+      35,
+      54,
+      65,
+      13,
+      24,
+      44,
+      48,
+      67,
+      9,
+      21,
+      'FREE',
+      59,
+      63,
+      7,
+      19,
+      34,
+      53,
+      61,
+      1,
+      20,
+      33,
+      46,
+      72,
+    ],
+    [35, 44, 34, 33]
+  )
+);
+
+// should return false;
+console.log(
+  checkForBingo(
+    [
+      8,
+      29,
+      35,
+      54,
+      65,
+      13,
+      24,
+      44,
+      48,
+      67,
+      9,
+      21,
+      'FREE',
+      59,
+      63,
+      7,
+      19,
+      34,
+      53,
+      61,
+      1,
+      20,
+      33,
+      46,
+      72,
+    ],
+    [1, 8, 21, 44, 48, 67, 72]
   )
 );
